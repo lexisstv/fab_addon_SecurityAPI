@@ -1,0 +1,11 @@
+*.pyc
+app.db
+./tmp
+./build/*
+env
+venv
+*.sublime*
+.idea
+
+.vscode
+*.egg-info
