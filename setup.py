@@ -31,7 +31,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'Flask-AppBuilder>=3.1.1',
+        'Flask-AppBuilder<3.0.0',
     ],
     tests_require=[
         'nose>=1.0',

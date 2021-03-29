@@ -90,7 +90,7 @@ class PermissionViewModelApi(ModelRestApi):
 
     @expose('/cleanup')
     @protect()
-    def greeting(self):
+    def cleanup(self):
         """
              Cleanup unused permissions from views and roles.
         ---
