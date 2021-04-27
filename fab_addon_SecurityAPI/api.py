@@ -1,5 +1,5 @@
-from flask import current_app
-from flask_appbuilder.api import expose, ModelRestApi
+from flask import current_app, Response, request
+from flask_appbuilder.api import expose, ModelRestApi, safe
 from flask_appbuilder.models.sqla.filters import FilterNotEqual
 from flask_appbuilder.security.decorators import protect
 
@@ -38,6 +38,53 @@ class UserModelApi(ModelRestApi):
     add_query_rel_fields = {
         'roles': [['name', FilterNotEqual, current_app.config["AUTH_ROLE_ADMIN"]]]
     }
+
+    @expose('/set_user_password', methods=['POST'])
+    @protect()
+    @safe
+    def set_user_password(self, *args, **kwargs) -> Response:
+        """
+           Set user password
+        ---
+        post:
+          description: >-
+             Set user password
+          parameters:
+            - name: username
+              in: query
+              required: true
+              schema:
+                type: string
+            - name: password
+              in: query
+              required: true
+              schema:
+                type: string
+          responses:
+            200:
+              description: successful
+              content:
+                application/json:
+            401:
+              $ref: '#/components/responses/401'
+            404:
+              $ref: '#/components/responses/404'
+            500:
+              $ref: '#/components/responses/500'
+          security:
+            - jwt_refresh: []
+        """
+        user = self.appbuilder.sm.find_user(request.args['username'])
+        if user is None:
+            return self.response(404, message = "User not found.")
+        if user.username == 'admin':
+            return self.response(404, message = "Can not change password for default user.")
+
+        self.appbuilder.sm.reset_password(user.id, request.args['password'])
+        return self.response(200, message = "Ok")
+
+
+
 
 
 class RoleModelApi(ModelRestApi):
